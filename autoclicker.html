@@ -1,79 +1,89 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Auto Clicker Settings</title>
+
+<!-- Password Protection -->
 <script>
 (async () => {
-  const HASHED_PASSWORD = "UGFzc3dvcmQxIQ==";
-  const unlocked = sessionStorage.getItem("unlocked");
-  if (unlocked === "true") return;
+    const HASHED_PASSWORD = "UGFzc3dvcmQxIQ=="; // "Password1"
+    if (sessionStorage.getItem("unlocked") === "true") return;
 
-  document.documentElement.style.display = "none";
+    document.documentElement.style.display = "none";
 
-  function encode(str) {
-    return btoa(str);
-  }
+    function encode(str) {
+        return btoa(str);
+    }
 
-  const input = prompt("Enter password:");
-  if (encode(input) === HASHED_PASSWORD) {
-    sessionStorage.setItem("unlocked", "true");
-    document.documentElement.style.display = "block";
-  } else {
-    alert("Incorrect password");
-    location.href = "about:blank";
-  }
+    const input = prompt("Enter password:");
+    if (encode(input) === HASHED_PASSWORD) {
+        sessionStorage.setItem("unlocked", "true");
+        document.documentElement.style.display = "block";
+    } else {
+        alert("Incorrect password");
+        location.href = "about:blank";
+    }
 })();
 </script>
 
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Auto Clicker Settings</title>
+<style>
+body { font-family: Arial, sans-serif; padding: 20px; background: #121212; color: #fff; }
+h1 { text-align: center; }
+label { display: block; margin-top: 15px; }
+input { padding: 8px; margin-top: 5px; border-radius: 5px; border: none; width: 200px; }
+button { margin-top: 20px; padding: 10px 20px; border: none; border-radius: 5px; background: #007bff; color: #fff; cursor: pointer; }
+button:hover { background: #0056b3; }
+#status-message { margin-top: 10px; font-weight: bold; }
+</style>
 </head>
 <body>
-    <h1>Auto Clicker Settings</h1>
+<h1>Auto Clicker Settings</h1>
 
-    <!-- Keybind Input -->
-    <label for="keybind">Keybind to Start/Stop Auto Clicker:</label>
-    <input type="text" id="keybind" maxlength="1" value="a">
-    <br><br>
+<label for="keybind">Keybind to Start/Stop Auto Clicker:</label>
+<input type="text" id="keybind" maxlength="1" placeholder="Enter a single key">
 
-    <!-- Click Speed Input -->
-    <label for="clickSpeed">Click Speed (ms):</label>
-    <input type="number" id="clickSpeed" value="1000" min="1">
-    <br><br>
+<label for="clickSpeed">Click Speed (ms):</label>
+<input type="number" id="clickSpeed" min="1" placeholder="1000">
 
-    <!-- Save Button -->
-    <button onclick="saveSettings()">Save Settings</button>
+<button onclick="saveSettings()">Save Settings</button>
+<p id="status-message"></p>
 
-    <!-- Feedback Message -->
-    <p id="status-message" style="color: green;"></p>
+<script>
+// Load saved settings
+document.addEventListener("DOMContentLoaded", () => {
+    const savedKeybind = localStorage.getItem("keybind");
+    const savedClickSpeed = localStorage.getItem("clickSpeed");
 
-    <script>
-        // Load settings from localStorage if available
-        document.addEventListener("DOMContentLoaded", () => {
-            const savedKeybind = localStorage.getItem("keybind");
-            const savedClickSpeed = localStorage.getItem("clickSpeed");
+    if (savedKeybind) document.getElementById("keybind").value = savedKeybind;
+    if (savedClickSpeed) document.getElementById("clickSpeed").value = savedClickSpeed;
+});
 
-            if (savedKeybind) {
-                document.getElementById("keybind").value = savedKeybind;
-            }
-            if (savedClickSpeed) {
-                document.getElementById("clickSpeed").value = savedClickSpeed;
-            }
-        });
+// Save settings function
+function saveSettings() {
+    const keybind = document.getElementById("keybind").value.trim();
+    const clickSpeed = parseInt(document.getElementById("clickSpeed").value);
 
-        // Save settings to localStorage
-        function saveSettings() {
-            const keybind = document.getElementById("keybind").value;
-            const clickSpeed = document.getElementById("clickSpeed").value;
+    if (!keybind || keybind.length !== 1) {
+        showStatus("Please enter a single character for the keybind.", "red");
+        return;
+    }
+    if (!clickSpeed || clickSpeed < 1) {
+        showStatus("Click speed must be at least 1 ms.", "red");
+        return;
+    }
 
-            if (keybind && clickSpeed >= 1) {
-                localStorage.setItem("keybind", keybind);
-                localStorage.setItem("clickSpeed", clickSpeed);
-                document.getElementById("status-message").textContent = "Settings saved!";
-            } else {
-                document.getElementById("status-message").textContent = "Please enter a valid keybind and speed.";
-            }
-        }
-    </script>
+    localStorage.setItem("keybind", keybind);
+    localStorage.setItem("clickSpeed", clickSpeed);
+    showStatus("Settings saved!", "green");
+}
+
+function showStatus(message, color) {
+    const status = document.getElementById("status-message");
+    status.textContent = message;
+    status.style.color = color;
+}
+</script>
 </body>
 </html>
